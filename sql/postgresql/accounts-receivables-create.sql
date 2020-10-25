@@ -150,7 +150,7 @@ create index qar_oe_employee_id_key on qar_oe (employee_id);
 create index qar_orderitems_trans_id_key on qar_orderitems (trans_id);
 create index qar_orderitems_id_key on qar_orderitems (id);
 --
-CREATE FUNCTION qar_del_recurring() returns opaque as '
+CREATE FUNCTION qar_del_recurring() returns trigger as '
 BEGIN
   DELETE FROM qar_recurring WHERE id = old.id;
   DELETE FROM qar_recurringemail WHERE id = old.id;
@@ -334,7 +334,7 @@ CREATE TRIGGER qar_check_department AFTER INSERT OR UPDATE ON qar_oe FOR EACH RO
    
    
    create function qar_ec_gift_certificates_audit_tr ()
-   returns opaque as '
+   returns trigger as '
    begin
            insert into qar_ec_gift_certificates_audit (
            gift_certificate_id, amount,
@@ -519,7 +519,7 @@ or (transaction_type='refund' and failed_p='f');
 -- fills creditcard_id into qar_ec_financial_transactions if it's missing
 -- (using the credit card associated with the order)
 create function fin_trans_ccard_update_tr ()
-returns opaque as '
+returns trigger as '
 declare
         v_creditcard_id         qar_ec_creditcards.creditcard_id%TYPE;
 begin
@@ -657,7 +657,7 @@ for each row execute procedure fin_trans_ccard_update_tr ();
    -- II. row-level trigger which updates ec_state_change_order_ids 
    -- so we know which rows to update in ec_orders
    -- create function ec_order_state_before_tr ()
-   -- returns opaque as '
+   -- returns trigger as '
    -- begin
    --         insert into ec_state_change_order_ids (order_id) values (new.order_id);
    -- 	return new;
@@ -672,7 +672,7 @@ for each row execute procedure fin_trans_ccard_update_tr ();
    
    -- gilbertw - I took the trigger procedure from OpenACS 3.2.5.
    create function qar_ec_order_state_after_tr ()
-   returns opaque as '
+   returns trigger as '
    declare
            -- v_order_id              integer;
            n_items                 integer;
@@ -789,7 +789,7 @@ for each row execute procedure fin_trans_ccard_update_tr ();
    
    
    create function qar_ec_offers_audit_tr ()
-   returns opaque as '
+   returns trigger as '
    begin
            insert into qar_ec_offers_audit (
            offer_id,
@@ -1145,7 +1145,7 @@ END;' language 'plpgsql';
 -- trio crap and we have a simple trigger for everything.
 
 create function trig_qar_ec_cert_amount_remains()
-returns opaque
+returns trigger
 as '
 DECLARE
         bal_amount_used         numeric;
@@ -1475,7 +1475,7 @@ END;' language 'plpgsql';
     
     -- Jerry - I removed usps_abbrev and/or state here
     create function qar_ec_sales_tax_by_state_audit_tr ()
-    returns opaque as '
+    returns trigger as '
     begin
             insert into qar_ec_sales_tax_by_state_audit (
             usps_abbrev, tax_rate,
